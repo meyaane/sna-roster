@@ -168,4 +168,48 @@ window.addEventListener('hashchange',function(){
 // Prepare first module immediately so it is ready when the user signs in.
 openModule('home',false);
 restoreRememberedLogin();
+
+<script type="module">
+  import { initializeApp } from "[https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js](https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js)";
+  import { getAnalytics } from "[https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js](https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js)";
+  import { getFirestore, doc, setDoc, getDoc } from "[https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js](https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js)";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBRJnjYsB6rF-ozyE82f87Xt-ZSuHnI",
+    authDomain: "sna-roster-db.firebaseapp.com",
+    projectId: "sna-roster-db",
+    storageBucket: "sna-roster-db.firebasestorage.app",
+    messagingSenderId: "574804842200",
+    appId: "1:574804842200:web:10c8fad68644225a73e9ad",
+    measurementId: "G-V1TJNFWB2V"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
+  window.db = db;
+
+  window.saveRosterToCloud = async function(rosterData) {
+    if (!window.db) return;
+    try {
+      await setDoc(doc(window.db, "rosters", "sharedState"), { data: rosterData, updatedAt: new Date().toISOString() });
+      console.log("บันทึกข้อมูลลง Cloud สำเร็จเรียบร้อยแล้วจ้า!");
+    } catch (e) {
+      console.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล:", e);
+    }
+  };
+
+  window.loadRosterFromCloud = async function() {
+    if (!window.db) return null;
+    try {
+      const docSnap = await getDoc(doc(window.db, "rosters", "sharedState"));
+      if (docSnap.exists()) {
+        return docSnap.data().data;
+      }
+    } catch (e) {
+      console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", e);
+    }
+    return null;
+  };
+</script>
 </script></body></html>
